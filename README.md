@@ -11,7 +11,7 @@ Running `make` will set up the Docker environment and produce the `scooba` binar
 
 ## Running
 
-Scooba depends on a couple of shared libaries that have been shipped within the repository for easier development. To force the linker to use the version in the `lib/` directory, you need to call the binary like so:
+Scooba depends on a couple of shared libaries that are produced during the `make build` step for easier development. To force the linker to use the version in the `lib/` directory, you need to call the binary like so:
 
 ````LD_LIBRARY_PATH=`pwd`/lib/:$LD_LIBRARY_PATH ./scooba````
 
