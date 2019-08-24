@@ -22,6 +22,26 @@ func DiveHandler(c *cli.Context) error {
 		panic(err)
 	}
 
+	// if -c flag is set, try to checkout target commit
+	if c.IsSet("commit") {
+		targetCommitHash := c.String("commit")
+
+		targetOid, err := getOidFromHashString(targetCommitHash)
+		if err != nil {
+			panic(err)
+		}
+
+		err = checkoutCommitId(repo, targetOid)
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Printf("I checked out commit %s. Dive in!\n", targetCommitHash)
+
+		return nil
+	}
+
+	// default behavior: do a revwalk, find and checkout the oldest commit
 	walk, err := repo.Walk()
 	if err != nil {
 		panic(err)
@@ -31,6 +51,7 @@ func DiveHandler(c *cli.Context) error {
 	var currentCommit *git.Commit
 
 	walk.Sorting(git.SortTime | git.SortReverse)
+
 	walk.PushHead()
 	iterator := func(commit *git.Commit) bool {
 		currentCommit = commit
@@ -47,12 +68,7 @@ func DiveHandler(c *cli.Context) error {
 		panic(fmt.Sprintf("Error: Commit %v not found.\n", currentCommit.Object))
 	}
 
-	err = repo.SetHeadDetached(currentCommitId)
-	if err != nil {
-		panic(err)
-	}
-
-	err = repo.CheckoutHead(nil)
+	err = checkoutCommitId(repo, currentCommitId)
 	if err != nil {
 		panic(err)
 	}
@@ -60,4 +76,18 @@ func DiveHandler(c *cli.Context) error {
 	fmt.Println("I checked out the oldest commit. Dive in!")
 
 	return nil
+}
+
+func getOidFromHashString(hash string) (*git.Oid, error) {
+	return git.NewOid(hash)
+}
+
+func checkoutCommitId(repo *git.Repository, commitId *git.Oid) error {
+	err := repo.SetHeadDetached(commitId)
+	if err != nil {
+		return err
+	}
+
+	err = repo.CheckoutHead(nil)
+	return err
 }

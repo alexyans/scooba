@@ -16,6 +16,12 @@ func main() {
 		cli.Command{
 			Name: "dive",
 			Usage: "resets repo to the oldest commit",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name: "commit, c",
+					Usage: "sets the commit hash to start from (default: oldest chronological commit)",
+				},
+			},
 			Action: handlers.DiveHandler,
 		},
 	}
