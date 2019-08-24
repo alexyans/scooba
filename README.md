@@ -17,4 +17,6 @@ Scooba depends on a couple of shared libaries that have been shipped within the 
 
 ## Command reference
 
-`scooba dive` - Checks out the oldest historical commit and sets the stage for everything else
+`scooba dive [-c <commit_hash>]` - Checks out the oldest historical commit and sets the stage for everything else
+
+- `-c, --commit <commit_hash>` : Start from a target commit instead of the chronologically oldest
