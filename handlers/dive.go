@@ -13,11 +13,7 @@ import (
  */
 
 func DiveHandler(c *cli.Context) error {
-	path, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-	repo, err := git.OpenRepository(path)
+	repo, err := handlers.GetRepoFromPwd()
 	if err != nil {
 		panic(err)
 	}
