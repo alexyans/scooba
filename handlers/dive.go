@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"fmt"
-	"os"
 
 	git "gopkg.in/libgit2/git2go.v24"
 	"github.com/urfave/cli"
@@ -13,7 +12,7 @@ import (
  */
 
 func DiveHandler(c *cli.Context) error {
-	repo, err := handlers.GetRepoFromPwd()
+	repo, err := GetRepoFromPwd()
 	if err != nil {
 		panic(err)
 	}
@@ -38,33 +37,14 @@ func DiveHandler(c *cli.Context) error {
 	}
 
 	// default behavior: do a revwalk, find and checkout the oldest commit
-	walk, err := repo.Walk()
-	if err != nil {
-		panic(err)
-	}
-	defer walk.Free()
+	commit, err := RevwalkFromHead(repo)
 
-	var currentCommit *git.Commit
-
-	walk.Sorting(git.SortTime | git.SortReverse)
-
-	walk.PushHead()
-	iterator := func(commit *git.Commit) bool {
-		currentCommit = commit
-		return false
+	commitId := commit.Object.Id()
+	if commitId == nil {
+		panic(fmt.Sprintf("Error: Commit %v not found.\n", commit.Object))
 	}
 
-	err = walk.Iterate(iterator)
-	if err != nil {
-		panic(err)
-	}
-
-	currentCommitId := currentCommit.Object.Id()
-	if currentCommitId == nil {
-		panic(fmt.Sprintf("Error: Commit %v not found.\n", currentCommit.Object))
-	}
-
-	err = checkoutCommitId(repo, currentCommitId)
+	err = checkoutCommitId(repo, commitId)
 	if err != nil {
 		panic(err)
 	}
