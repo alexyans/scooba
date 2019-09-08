@@ -9,7 +9,7 @@ install:
 
 build:
 	@echo "Building binary..."
-	@docker run --rm -it -v `pwd`:/go/src/github.com/alexyans/scooba scooba:latest /bin/bash -c "CGO_ENABLE=0 GOOS=linux GOARCH=amd64 go build -a -o scooba ."
+	@docker run --rm -it -v `pwd`:/go/src/github.com/alexyans/scooba scooba:latest /bin/bash scripts/build.sh
 	@echo "Done."
 .PHONY: build
 
@@ -20,7 +20,7 @@ shell:
 
 clean:
 	@echo "Deleting binary and Docker image..."
-	@rm -f scooba
+	@rm -rf scooba lib
 	@docker image rm scooba:latest
 	@echo "Done."
 .PHONY: clean
