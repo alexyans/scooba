@@ -26,7 +26,12 @@ func DiveHandler(c *cli.Context) error {
 			panic(err)
 		}
 
-		err = checkoutCommitId(repo, targetOid)
+		targetCommit, err := repo.LookupCommit(targetOid)
+		if err != nil {
+			panic(err)
+		}
+
+		err = resetToCommitId(repo, targetCommit)
 		if err != nil {
 			panic(err)
 		}
@@ -38,13 +43,11 @@ func DiveHandler(c *cli.Context) error {
 
 	// default behavior: do a revwalk, find and checkout the oldest commit
 	commit, err := RevwalkFromHead(repo)
-
-	commitId := commit.Object.Id()
-	if commitId == nil {
-		panic(fmt.Sprintf("Error: Commit %v not found.\n", commit.Object))
+	if err != nil {
+		panic(fmt.Sprintln("Error: Initial commit not found."))
 	}
 
-	err = checkoutCommitId(repo, commitId)
+	err = resetToCommitId(repo, commit)
 	if err != nil {
 		panic(err)
 	}
@@ -58,12 +61,9 @@ func getOidFromHashString(hash string) (*git.Oid, error) {
 	return git.NewOid(hash)
 }
 
-func checkoutCommitId(repo *git.Repository, commitId *git.Oid) error {
-	err := repo.SetHeadDetached(commitId)
-	if err != nil {
-		return err
-	}
+// resetToCommitId performs a hard reset to rewind the working directory to match the target commit
+func resetToCommitId(repo *git.Repository, commit *git.Commit) error {
+	err := repo.ResetToCommit(commit, git.ResetHard, nil)
 
-	err = repo.CheckoutHead(nil)
 	return err
 }
