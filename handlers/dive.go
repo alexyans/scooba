@@ -3,7 +3,6 @@ package handlers
 import (
 	"fmt"
 
-	git "gopkg.in/libgit2/git2go.v24"
 	"github.com/urfave/cli"
 )
 
@@ -12,7 +11,7 @@ import (
  */
 
 func DiveHandler(c *cli.Context) error {
-	repo, err := GetRepoFromPwd()
+	repo, err := getRepoFromPwd()
 	if err != nil {
 		panic(err)
 	}
@@ -42,7 +41,7 @@ func DiveHandler(c *cli.Context) error {
 	}
 
 	// default behavior: do a revwalk, find and checkout the oldest commit
-	commit, err := RevwalkFromHead(repo)
+	commit, err := revwalkFromHead(repo)
 	if err != nil {
 		panic(fmt.Sprintln("Error: Initial commit not found."))
 	}
@@ -55,15 +54,4 @@ func DiveHandler(c *cli.Context) error {
 	fmt.Println("I checked out the oldest commit. Dive in!")
 
 	return nil
-}
-
-func getOidFromHashString(hash string) (*git.Oid, error) {
-	return git.NewOid(hash)
-}
-
-// resetToCommitId performs a hard reset to rewind the working directory to match the target commit
-func resetToCommitId(repo *git.Repository, commit *git.Commit) error {
-	err := repo.ResetToCommit(commit, git.ResetHard, nil)
-
-	return err
 }

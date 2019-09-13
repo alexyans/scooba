@@ -12,8 +12,8 @@ func main() {
 	app.Name = "Scooba"
 	app.Usage = "Dive into a git-tracked codebase"
 
-	app.Commands = []cli.Command {
-		cli.Command{
+	app.Commands = []cli.Command{
+		{
 			Name: "dive",
 			Usage: "resets repo to the oldest commit",
 			Flags: []cli.Flag{
@@ -23,6 +23,11 @@ func main() {
 				},
 			},
 			Action: handlers.DiveHandler,
+		},
+		{
+			Name: "forward",
+			Usage: "moves ahead by as many commits as specified (Default: 1)",
+			Action: handlers.ForwardHandler,
 		},
 	}
 
