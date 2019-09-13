@@ -87,6 +87,35 @@ func revwalkNext(repo *git.Repository, currentheadId *git.Oid) (*git.Commit, err
 	return nextCommit, nil
 }
 
+func revwalkPrev(repo *git.Repository, targetId *git.Oid) (*git.Commit, error) {
+	walk, err := repo.Walk()
+	if err != nil {
+		return nil, err
+	}
+	defer walk.Free()
+
+	var prevCommit *git.Commit
+
+	walk.Sorting(git.SortTopological)
+
+	// Push the current head to traverse toward its ancestors
+	walk.PushHead()
+	iterator := func(commit *git.Commit) bool {
+		if commit.Parent(0) != nil && targetId.Equal(commit.Object.Id()) {
+			prevCommit = commit
+			return false
+		}
+		return true
+	}
+
+	err = walk.Iterate(iterator)
+	if err != nil {
+		return nil, err
+	}
+
+	return prevCommit, nil
+}
+
 func getOidFromHashString(hash string) (*git.Oid, error) {
 	return git.NewOid(hash)
 }
@@ -98,7 +127,7 @@ func resetToCommitId(repo *git.Repository, commit *git.Commit) error {
 	return err
 }
 
-// getOriginHead peels the origin/HEAD reference to retrieve a commit id
+// getOriginHeadId peels the origin/HEAD reference to retrieve a commit id
 func getOriginHeadId(repo *git.Repository) (*git.Oid, error) {
 	branch, err := repo.LookupBranch("origin/HEAD", git.BranchRemote)
 	if err != nil {

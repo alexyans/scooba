@@ -22,3 +22,5 @@ Scooba depends on a couple of shared libaries that are produced during the `make
 - `-c, --commit <commit_hash>` : Start from a target commit instead of the chronologically oldest
 
 `scooba forward` - Checks out the next commit in topological order
+
+`scooba backward` - Checks out the previous commit in topological order

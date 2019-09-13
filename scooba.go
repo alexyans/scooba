@@ -29,6 +29,11 @@ func main() {
 			Usage: "moves ahead by as many commits as specified (Default: 1)",
 			Action: handlers.ForwardHandler,
 		},
+		{
+			Name: "backward",
+			Usage: "moves back by as many commits as specified (Default: 1)",
+			Action: handlers.BackwardHandler,
+		},
 	}
 
 	err := app.Run(os.Args)
