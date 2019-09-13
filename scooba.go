@@ -15,6 +15,7 @@ func main() {
 	app.Commands = []cli.Command{
 		{
 			Name: "dive",
+			Aliases: []string{"d"},
 			Usage: "resets repo to the oldest commit",
 			Flags: []cli.Flag{
 				cli.StringFlag{
@@ -26,11 +27,13 @@ func main() {
 		},
 		{
 			Name: "forward",
+			Aliases: []string{"f"},
 			Usage: "moves ahead by as many commits as specified (Default: 1)",
 			Action: handlers.ForwardHandler,
 		},
 		{
 			Name: "backward",
+			Aliases: []string{"b"},
 			Usage: "moves back by as many commits as specified (Default: 1)",
 			Action: handlers.BackwardHandler,
 		},

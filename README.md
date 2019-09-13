@@ -17,10 +17,10 @@ Scooba depends on a couple of shared libaries that are produced during the `make
 
 ## Command reference
 
-`scooba dive [-c <commit_hash>]` - Checks out the oldest historical commit and sets the stage for everything else
+`scooba [dive | d] [-c <commit_hash>]` - Checks out the oldest historical commit and sets the stage for everything else
 
 - `-c, --commit <commit_hash>` : Start from a target commit instead of the chronologically oldest
 
-`scooba forward` - Checks out the next commit in topological order
+`scooba [forward | f]` - Checks out the next commit in topological order
 
-`scooba backward` - Checks out the previous commit in topological order
+`scooba [backward | b]` - Checks out the previous commit in topological order
