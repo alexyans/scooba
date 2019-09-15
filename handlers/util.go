@@ -120,9 +120,23 @@ func getOidFromHashString(hash string) (*git.Oid, error) {
 	return git.NewOid(hash)
 }
 
-// resetToCommitId performs a hard reset to rewind the working directory to match the target commit
-func resetToCommitId(repo *git.Repository, commit *git.Commit) error {
+// resetWorktreeToCommitId performs a hard reset to rewind the working directory to match the target commit
+func resetWorktreeToCommit(repo *git.Repository, commit *git.Commit) error {
 	err := repo.ResetToCommit(commit, git.ResetHard, nil)
+
+	return err
+}
+
+// resetIndexToCommitId performs a mixed reset to rewind the index to match the target commit
+func resetIndexToCommit(repo *git.Repository, commit *git.Commit) error {
+	err := repo.ResetToCommit(commit, git.ResetMixed, nil)
+
+	return err
+}
+
+// resetHeadToCommitId performs a soft rest to set HEAD to the target commit
+func resetHeadToCommit(repo *git.Repository, commit *git.Commit) error {
+	err := repo.ResetToCommit(commit, git.ResetSoft, nil)
 
 	return err
 }

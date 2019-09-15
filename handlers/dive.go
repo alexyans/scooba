@@ -30,7 +30,7 @@ func DiveHandler(c *cli.Context) error {
 			panic(err)
 		}
 
-		err = resetToCommitId(repo, targetCommit)
+		err = resetWorktreeToCommit(repo, targetCommit)
 		if err != nil {
 			panic(err)
 		}
@@ -46,7 +46,7 @@ func DiveHandler(c *cli.Context) error {
 		panic(fmt.Sprintln("Error: Initial commit not found."))
 	}
 
-	err = resetToCommitId(repo, commit)
+	err = resetWorktreeToCommit(repo, commit)
 	if err != nil {
 		panic(err)
 	}

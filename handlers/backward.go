@@ -36,7 +36,7 @@ func BackwardHandler(c *cli.Context) error {
 		panic(err)
 	}
 	
-	err = resetToCommitId(repo, prevCommit)
+	err = resetWorktreeToCommit(repo, prevCommit)
 	if err != nil {
 		panic(err)
 	}

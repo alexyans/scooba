@@ -26,7 +26,27 @@ func ForwardHandler(c *cli.Context) error {
 		panic(err)
 	}
 	
-	err = resetToCommitId(repo, nextCommit)
+	// update working tree to introduce next batch of changes
+	err = resetWorktreeToCommit(repo, nextCommit)
+	if err != nil {
+		panic(err)
+	}
+
+	// rewind index to last known state
+	// the introduced changed inbetween are in the working tree but not in the index
+	// and can be diffed for inspection
+	oldHead, err := repo.LookupCommit(head.Target())
+	if err != nil {
+		panic(err)
+	}
+	err = resetIndexToCommit(repo, oldHead)
+	if err != nil {
+		panic(err)
+	}
+
+	// rewinding the index also moved HEAD
+	// set it back to the newly visited commit ID so navigation can resume from that point
+	err = resetHeadToCommit(repo, nextCommit)
 	if err != nil {
 		panic(err)
 	}
