@@ -26,3 +26,9 @@ Scooba depends on a couple of shared libaries that are produced during the `make
 `scooba [forward | f]` - Visit the next commit in topological order (children of the current commit)
 
 `scooba [backward | b]` - Visit the previous commit in topological order (parent of the current commit)
+
+## Roadmap
+- Associate commit range to PR and Issue threads
+- Extend navigation
+- Handle repository migration
+- Make default step-through smarter (for instance, skip over commits that fix typos or edit the readme)
