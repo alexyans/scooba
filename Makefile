@@ -15,7 +15,7 @@ build:
 
 test:
 	@echo "Running tests..."
-	@docker run --rm -it -v `pwd`:/go/src/github.com/alexyans/scooba scooba:latest go test
+	@docker run --rm -it -v `pwd`:/go/src/github.com/alexyans/scooba scooba:latest /bin/bash scripts/test.sh
 	@echo "Done."
 .PHONY: test
 

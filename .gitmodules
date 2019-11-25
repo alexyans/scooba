@@ -1,0 +1,3 @@
+[submodule "fixtures/origin"]
+	path = fixtures/origin
+	url = https://github.com/alexyans/scooba-test-fixtures.git
