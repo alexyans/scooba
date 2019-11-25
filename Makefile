@@ -13,6 +13,12 @@ build:
 	@echo "Done."
 .PHONY: build
 
+test:
+	@echo "Running tests..."
+	@docker run --rm -it -v `pwd`:/go/src/github.com/alexyans/scooba scooba:latest go test
+	@echo "Done."
+.PHONY: test
+
 shell:
 	@echo "Starting shell session..."
 	@docker run --rm -it -v `pwd`:/go/src/github.com/alexyans/scooba/ scooba:latest bash

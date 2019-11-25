@@ -10,7 +10,7 @@ import (
  *	ForwardHandler checks out the child commit of the current HEAD
  */
 func ForwardHandler(c *cli.Context) error {
-	repo, err := getRepoFromPwd()
+	repo, err := GetRepoFromPwd()
 	if err != nil {
 		panic(err)
 	}

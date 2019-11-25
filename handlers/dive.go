@@ -11,7 +11,7 @@ import (
  */
 
 func DiveHandler(c *cli.Context) error {
-	repo, err := getRepoFromPwd()
+	repo, err := GetRepoFromPwd()
 	if err != nil {
 		panic(err)
 	}

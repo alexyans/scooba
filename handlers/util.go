@@ -6,7 +6,7 @@ import (
 	git "gopkg.in/libgit2/git2go.v24"
 )
 
-func getRepoFromPwd() (*git.Repository, error) {
+func GetRepoFromPwd() (*git.Repository, error) {
 	path, err := os.Getwd()
 	if err != nil {
 		return nil, err
