@@ -143,7 +143,7 @@ func resetHeadToCommit(repo *git.Repository, commit *git.Commit) error {
 
 // getOriginHeadId peels the origin/HEAD reference to retrieve a commit id
 func getOriginHeadId(repo *git.Repository) (*git.Oid, error) {
-	branch, err := repo.LookupBranch("origin/HEAD", git.BranchRemote)
+	branch, err := repo.LookupBranch("origin/master", git.BranchRemote)
 	if err != nil {
 		return nil, err
 	}

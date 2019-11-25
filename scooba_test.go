@@ -6,6 +6,7 @@ import "github.com/urfave/cli"
 import "flag"
 import "github.com/alexyans/scooba/handlers"
 import "fmt"
+import "strconv"
 
 func contextWithFlag(t *testing.T, name string, value interface{}) *cli.Context {
 	flag := &flag.FlagSet{}
@@ -13,12 +14,24 @@ func contextWithFlag(t *testing.T, name string, value interface{}) *cli.Context 
 	case string:
 		ret := flag.String(name, "", "")
 		if ret == nil {
-			t.Error("Failed to create flag.")
+			t.Error("Failed to create string flag.")
+		}
+	case bool:
+		ret := flag.Bool(name, false, "")
+		if ret == nil {
+			t.Error("Failed to create bool flag.")
 		}
 	}
 	
 	context := cli.NewContext(nil, flag, nil)
-	err := context.Set(name, value.(string))
+	var err error
+	switch value.(type) {
+	case string:
+		err = context.Set(name, value.(string))
+	case bool:
+		err = context.Set(name, strconv.FormatBool(value.(bool)))
+	}
+	
 	if err != nil {
 		t.Error("Failed to set flag")
 	}
@@ -69,7 +82,7 @@ func TestDiveWithCommit(t *testing.T) {
 	}
 }
 
-func TestDiveNonExistent(t *testing.T) {
+func TestDiveNonExistentCommit(t *testing.T) {
 	path := setup()
 	commitHash := "dcdcdc"
 	context := contextWithFlag(t, "commit", commitHash)
@@ -81,4 +94,38 @@ func TestDiveNonExistent(t *testing.T) {
 	}()
 
 	_ = handlers.DiveHandler(context)
+}
+
+func TestForward(t *testing.T) {
+	path := setup()
+	context := cli.NewContext(nil, &flag.FlagSet{}, nil)
+	_ = handlers.DiveHandler(context)
+
+	context = contextWithFlag(t, "forward", true)
+	err := handlers.ForwardHandler(context)
+	if err != nil {
+		t.Error(fmt.Sprintf("Forward in path %s failed.", path))
+	}
+
+	err = handlers.ForwardHandler(context)
+	if err != nil {
+		t.Error(fmt.Sprintf("Forward in path %s failed.", path))
+	}
+}
+
+func TestBackward(t *testing.T) {
+	path := setup()
+	context := cli.NewContext(nil, &flag.FlagSet{}, nil)
+	_ = handlers.DiveHandler(context)
+
+	context = contextWithFlag(t, "backward", true)
+	err := handlers.BackwardHandler(context)
+	if err != nil {
+		t.Error(fmt.Sprintf("Backward in path %s failed.", path))
+	}
+
+	err = handlers.BackwardHandler(context)
+	if err != nil {
+		t.Error(fmt.Sprintf("Forward in path %s failed.", path))
+	}
 }
