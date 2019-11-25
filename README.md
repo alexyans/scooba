@@ -9,6 +9,12 @@ You can start from the oldest commit by default, or specify a target commit as t
 
 You will need to have **Docker** and **make** on your host.
 
+To run the tests, you will also need to pull the mock repository in `fixtures/origin`. Git ignores `.git` subdirs, so the fixtures have been defined as a submodule available at https://github.com/alexyans/scooba-test-fixtures.git . To clone the fixtures along with the parent repository, you need to use the `--recurse-submodules` flag as follows:
+
+```bash
+$ git clone --recurse-submodules [GITHUB URL]
+```
+
 Running `make` will set up the Docker environment and produce the `scooba` binary. 
 
 ## Running
