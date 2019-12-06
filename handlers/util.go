@@ -29,9 +29,14 @@ func revwalkFromHead(repo *git.Repository) (*git.Commit, error) {
 
 	var currentCommit *git.Commit
 
-	walk.Sorting(git.SortTime | git.SortReverse)
+	walk.Sorting(git.SortTopological | git.SortReverse)
+	
+	originHeadId, err := getOriginHeadId(repo)
+	if err != nil {
+		return nil, err
+	}
 
-	walk.PushHead()
+	walk.Push(originHeadId)
 	iterator := func(commit *git.Commit) bool {
 		currentCommit = commit
 		return false
@@ -45,7 +50,7 @@ func revwalkFromHead(repo *git.Repository) (*git.Commit, error) {
 	return currentCommit, nil
 }
 
-func revwalkNext(repo *git.Repository, currentheadId *git.Oid) (*git.Commit, error) {
+func revwalkNext(repo *git.Repository, currentHeadId *git.Oid) (*git.Commit, error) {
 	walk, err := repo.Walk()
 	if err != nil {
 		return nil, err
@@ -53,8 +58,7 @@ func revwalkNext(repo *git.Repository, currentheadId *git.Oid) (*git.Commit, err
 	defer walk.Free()
 
 	var nextCommit *git.Commit
-
-	walk.Sorting(git.SortTopological | git.SortReverse)
+	walk.Sorting(git.SortTopological)
 
 	// Normally you would push the current head and traverse toward ancestors
 	// and you would hide the commit you have visited, along with its ancestors.
@@ -69,13 +73,15 @@ func revwalkNext(repo *git.Repository, currentheadId *git.Oid) (*git.Commit, err
 		return nil, err
 	}
 
-	walk.Hide(currentheadId)
+	// walk.Hide(currentHeadId)
 	walk.Push(originHeadId)
+
 	iterator := func(commit *git.Commit) bool {
-		if commit.Parent(0) != nil && currentheadId.Equal(commit.Parent(0).Object.Id()) {
+		if isParent(currentHeadId, commit) {
 			nextCommit = commit
 			return false
 		}
+
 		return true 
 	}
 
@@ -87,7 +93,23 @@ func revwalkNext(repo *git.Repository, currentheadId *git.Oid) (*git.Commit, err
 	return nextCommit, nil
 }
 
-func revwalkPrev(repo *git.Repository, targetId *git.Oid) (*git.Commit, error) {
+func isParent(ancestorId *git.Oid, currentCommit *git.Commit) bool {
+	if currentCommit.Parent(0) == nil && currentCommit.Parent(1) == nil {
+		return false
+	}
+
+	if currentCommit.Parent(0) != nil && ancestorId.Equal(currentCommit.Parent(0).Object.Id()) {
+		return true
+	}
+
+	if currentCommit.Parent(1) != nil && ancestorId.Equal(currentCommit.Parent(1).Object.Id()) {
+		return true
+	}
+	
+	return false
+}
+
+func revwalkPrev(repo *git.Repository, currentHeadId *git.Oid) (*git.Commit, error) {
 	walk, err := repo.Walk()
 	if err != nil {
 		return nil, err
@@ -95,16 +117,16 @@ func revwalkPrev(repo *git.Repository, targetId *git.Oid) (*git.Commit, error) {
 	defer walk.Free()
 
 	var prevCommit *git.Commit
-
 	walk.Sorting(git.SortTopological)
 
 	// Push the current head to traverse toward its ancestors
 	walk.PushHead()
 	iterator := func(commit *git.Commit) bool {
-		if commit.Parent(0) != nil && targetId.Equal(commit.Object.Id()) {
-			prevCommit = commit
+		if commit.Parent(0) != nil && currentHeadId.Equal(commit.Parent(0).Object.Id()) {
+			prevCommit = commit.Parent(0)
 			return false
 		}
+		
 		return true
 	}
 
