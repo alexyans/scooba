@@ -11,6 +11,22 @@ import (
  */
 
 func DiveHandler(c *cli.Context) error {
+	summary, err := Dive(c)
+	if err != nil {
+		return err
+	}
+
+	if c.IsSet("commit") {
+		fmt.Printf("I checked out the target commit. Dive in!\n")
+	} else {
+		fmt.Println("I checked out the oldest commit. Dive in!")
+	}
+
+	fmt.Println(summary)
+	return nil
+}
+
+func Dive(c *cli.Context) (*Summary, error) {
 	repo, err := GetRepoFromPwd()
 	if err != nil {
 		panic(err)
@@ -35,9 +51,7 @@ func DiveHandler(c *cli.Context) error {
 			panic(err)
 		}
 
-		fmt.Printf("I checked out commit %s. Dive in!\n", targetCommitHash)
-
-		return nil
+		return NewSummary(targetCommit), nil
 	}
 
 	// default behavior: do a revwalk, find and checkout the oldest commit
@@ -51,7 +65,5 @@ func DiveHandler(c *cli.Context) error {
 		panic(err)
 	}
 
-	fmt.Println("I checked out the oldest commit. Dive in!")
-
-	return nil
+	return NewSummary(commit), nil
 }

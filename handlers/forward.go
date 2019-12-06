@@ -10,6 +10,17 @@ import (
  *	ForwardHandler checks out the child commit of the current HEAD
  */
 func ForwardHandler(c *cli.Context) error {
+	summary, err := Forward(c)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Checked out the next commit in master.")
+	fmt.Println(summary)
+	return nil
+}
+
+func Forward(c *cli.Context) (*Summary, error) {
 	repo, err := GetRepoFromPwd()
 	if err != nil {
 		panic(err)
@@ -51,11 +62,9 @@ func ForwardHandler(c *cli.Context) error {
 		panic(err)
 	}
 
-	fmt.Println("Checked out the next commit.")
-
 	// do a revwalk by specifying the start of the range to be current commit
 	// jump by 1, or later X
 	// then checkout result
 
-	return nil
+	return NewSummary(nextCommit), nil
 }

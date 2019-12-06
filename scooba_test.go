@@ -59,9 +59,14 @@ func TestDiveDefault(t *testing.T) {
 	path := setup()
 	context := cli.NewContext(nil, &flag.FlagSet{}, nil)
 
-	err := handlers.DiveHandler(context)
+	current, err := handlers.Dive(context)
 	if err != nil {
 		t.Error(fmt.Sprintf("Dive without argument failed in path %s", path))
+	}
+
+	expected := "404c882ea87664fcf166f608df4f8d351462e353"
+	if *current.Hash != expected {
+		t.Error(fmt.Sprintf("Expected commit %s.\nGot commit %s.", expected, *current.Hash))
 	}
 }
 
@@ -76,7 +81,7 @@ func TestDiveWithCommit(t *testing.T) {
 		}
 	}()
 
-	err := handlers.DiveHandler(context)
+	_, err := handlers.Dive(context)
 	if err != nil {
 		t.Error(fmt.Sprintf("Dive failed for commit %s in path %s.", commitHash, path))
 	}
@@ -93,7 +98,8 @@ func TestDiveNonExistentCommit(t *testing.T) {
 		}
 	}()
 
-	_ = handlers.DiveHandler(context)
+	_, _ = handlers.Dive(context)
+
 }
 
 func TestForward(t *testing.T) {
@@ -102,14 +108,14 @@ func TestForward(t *testing.T) {
 	_ = handlers.DiveHandler(context)
 
 	context = contextWithFlag(t, "forward", true)
-	err := handlers.ForwardHandler(context)
+	current, err := handlers.Forward(context)
 	if err != nil {
 		t.Error(fmt.Sprintf("Forward in path %s failed.", path))
 	}
 
-	err = handlers.ForwardHandler(context)
-	if err != nil {
-		t.Error(fmt.Sprintf("Forward in path %s failed.", path))
+	expected := "38aa6cc8d439d45da9c6be2cf5dade65a0367fc8"
+	if current != expected {
+		t.Error(fmt.Sprintf("Expected commit %s.\nGot commit %s.", expected, current))
 	}
 }
 
@@ -117,15 +123,17 @@ func TestBackward(t *testing.T) {
 	path := setup()
 	context := cli.NewContext(nil, &flag.FlagSet{}, nil)
 	_ = handlers.DiveHandler(context)
+	_ = handlers.ForwardHandler(context)
+	_ = handlers.ForwardHandler(context)
 
 	context = contextWithFlag(t, "backward", true)
-	err := handlers.BackwardHandler(context)
+	current, err := handlers.Backward(context)
 	if err != nil {
 		t.Error(fmt.Sprintf("Backward in path %s failed.", path))
 	}
 
-	err = handlers.BackwardHandler(context)
-	if err != nil {
-		t.Error(fmt.Sprintf("Forward in path %s failed.", path))
+	expected := "38aa6cc8d439d45da9c6be2cf5dade65a0367fc8"
+	if current != expected {
+		t.Error(fmt.Sprintf("Expected commit %s.\nGot commit %s.", expected, current))
 	}
 }
